@@ -1,0 +1,42 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<http auto-config="true">
+		<!-- <intercept-url pattern="/**" access="" /> -->
+		<intercept-url pattern="/dashboard**" access="ROLE_COMPANY" />
+		
+		<form-login 
+		    login-page="/login" 
+		    default-target-url="/dashboard" 
+			authentication-failure-url="/login?error"
+			username-parameter="inputEmail"
+			password-parameter="inputPassword" />
+		<logout logout-success-url="/login?signOut" />
+		
+		<session-management invalid-session-url="/login" />
+		
+		<!-- openid-login user-service-ref="openIdUserService" >
+  			<attribute-exchange >
+    			<openid-attribute name="email" type="http://schema.openid.net/contact/email" required="true" />
+    			<openid-attribute name="firstName" type="http://axschema.org/namePerson/first" required="true" />
+    			<openid-attribute name="lastName" type="http://axschema.org/namePerson/last" required="true" />
+  			</attribute-exchange>
+		</openid-login-->
+
+	</http>
+
+	<authentication-manager>
+	  <authentication-provider>
+	    <user-service>
+		<user name="123@me" password="123" authorities="ROLE_COMPANY" />
+		<user name="eric@me" password="123" authorities="ROLE_USER" />
+	    </user-service>
+	  </authentication-provider>
+	</authentication-manager>
+
+</beans:beans>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	
+	<beans:bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<beans:property name="locations">
+			<beans:list>
+				<beans:value>classpath:Config.properties</beans:value>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	
+	<context:component-scan base-package="com.headhigh.seagullcare" />
+	
+	<beans:bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <beans:property name="driverClassName" value="org.postgresql.Driver"/>
+        <beans:property name="url" value="jdbc:postgresql://localhost:5432/ExpressCare"/>
+        <beans:property name="username" value="innovation2"/>
+        <beans:property name="password" value=""/>
+    </beans:bean> 
+    
+    <beans:bean id="hibernate3AnnotatedSessionFactory"
+        class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <beans:property name="dataSource" ref="dataSource" />
+        <beans:property name="annotatedClasses">
+            <beans:list>
+                <beans:value>com.headhigh.seagullcare.model.Member</beans:value>
+                <beans:value>com.headhigh.seagullcare.model.Users</beans:value>
+                <beans:value>com.headhigh.seagullcare.model.Company</beans:value>
+            </beans:list>
+        </beans:property>
+        <beans:property name="hibernateProperties">
+            <beans:props>
+                <beans:prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</beans:prop>
+                <beans:prop key="hibernate.current_session_context_class">thread</beans:prop>
+                <beans:prop key="hibernate.show_sql">true</beans:prop>
+            </beans:props>
+        </beans:property>
+    </beans:bean>
+    
+    
+    <beans:bean id="seagullCareDAO"
+		class="com.headhigh.seagullcare.dao.SeagullCareDAOImpl">
+		<beans:property name="sessionFactory" ref="hibernate3AnnotatedSessionFactory"/>
+	</beans:bean>
+	
+	<beans:bean id="memberService"
+		class="com.headhigh.seagullcare.service.MemberService" >
+		<beans:property name="seagullCareDAO" ref="seagullCareDAO" />
+		<beans:property name="emailService" ref="emailService" />
+	</beans:bean>
+	
+	<beans:bean id="emailService"
+		class="com.headhigh.seagullcare.service.EmailService">
+		<beans:property name="fromEmail">
+			<beans:value>${from.email}</beans:value>
+		</beans:property>
+		<beans:property name="pwd">
+			<beans:value>${email.pwd}</beans:value>
+		</beans:property>
+	</beans:bean>
+	
+	<beans:bean id="contactService"
+		class="com.headhigh.seagullcare.service.ContactService" >
+		<beans:property name="emailService" ref="emailService" />
+	</beans:bean>
+	
+	
+</beans:beans>
